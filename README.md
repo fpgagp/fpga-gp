@@ -22,47 +22,11 @@ In literature, Genetic Programming implementations follow two main different app
 
 The first approach is now abandoned because of undocumented bitstreams and the possibility of physical damage to the FPGA device in case of errors.
 
-The most used layer is called Virtual Reconfigurable Circuit (VCR) where semantic is not based on trees, but on Carthesian Genetic Programming (CGP).
+The second approach involves a behavior defined by the configuration memory. The most used layer is called Virtual Reconfigurable Circuit (VCR) where semantic is not based on trees, but on Carthesian Genetic Programming (CGP).
 
 CGP does not allow to easily define a Crossover operator with a semantic meaning, and usually the only defined operator is the Mutation.
 
 This project propose a new reconfigurable layer, based on tree semantic, called *Programmable Expression Tree*.
-
-## High-Level Architecture
-
-The algorithm is implemented inside the GP_CORE block, is written in VHDL 2008 and expose an AXI interface to interconnect with the soft core that manage the communication with the Human Machine Interface (HMI).
-
-
-![high level architecture](/docs/images/hl_arch.png)
-
-A system can contain one or more GP_CORE blocks and a soft core that efficiently implement standard such as Ethernet, RS232, USB, etc..
-
-Multiple instances running independently enable a parallel exploration based on islands.
-
-
-
-![gp_core high level architecture](/docs/images/gp_core_hl_arch.png)
-
-
-| Module       | Description                            |
-| ------------ | -------------------------------------- |
-| RND_GEN      | Random number generator                |
-| EXP_TREE     | Programmable expression tree           |
-| EXP_TREE_FIT | Tree manager and fitness evaluation    |
-| SEL          | Selection                              |
-| GP_OP        | Copy, Mutation and Crossover operators |
-| CONTROL FSM  | Control Finite State Machine           |
-
-
-
-| Memory | Description                |
-| ------ | -------------------------- |
-| MEM_P  | Population                 |
-| MEM_F  | Fitness of individuals     |
-| MEM_N  | New Generation             |
-| MEM_L  | Lookup to evaluate fitness |
-
-
 
 ## Expression Trees
 
@@ -103,6 +67,63 @@ The previous function is binary encoded as
 
 ![binary tree string](/docs/images/exp_tree_string_bin.png)
 
-MSB bits represent the first node
+MSB bits represent the first node. Depth-First ordering enable us to select sub-trees by using adjacent bits. This property simplify the Crossover implementation.
 
 **Important**: Every binary string permutation is a valid tree because the implementation add an additional virtual level, made of user-defined operators, to avoid issues with operators such that expect a parameter (ex. sum)
+
+## High-Level Architecture
+
+The algorithm is implemented inside the GP_CORE block, is written in VHDL 2008 and expose an AXI interface to interconnect with the soft core that manage the communication with the Human Machine Interface (HMI).
+
+
+![high level architecture](/docs/images/hl_arch.png)
+
+A system can contain one or more GP_CORE blocks and a soft core that efficiently implement standard such as Ethernet, RS232, USB, etc..
+
+Multiple instances running independently enable a parallel exploration based on islands.
+
+
+
+![gp_core high level architecture](/docs/images/gp_core_hl_arch.png)
+
+
+| Module       | Description                            |
+| ------------ | -------------------------------------- |
+| RND_GEN      | Random number generator                |
+| EXP_TREE     | Programmable expression tree           |
+| EXP_TREE_FIT | Tree manager and fitness evaluation    |
+| SEL          | Selection                              |
+| GP_OP        | Copy, Mutation and Crossover operators |
+| CONTROL FSM  | Control Finite State Machine           |
+
+
+
+| Memory | Description                |
+| ------ | -------------------------- |
+| MEM_P  | Population                 |
+| MEM_F  | Fitness of individuals     |
+| MEM_N  | New Generation             |
+| MEM_L  | Lookup to evaluate fitness |
+
+At the startup, a random population is generated and stored by the Random Number Generator.
+
+In the next stage, every individual is loaded into the programmable expression tree for its evaluation. The module EXP_TREE_FIT is responsible to provide input values (ex. variables values) to the tree and to compare results with expected values. After comparing all values, a fitness score is calculated and stored in the specific memory.
+
+After that every individual has a fitness score, there is a selection phase. Tournament selection is implemented in the reference implementation, although other strategies are possibles.
+
+Genetic Operators are applied to selected Individuals to build the next generation.
+
+Memories are on-chip to minimize latency and maximize bandwidth. Memories that require parallel access, such as MEM_F containing the fitness score of individuals, are multi-port to furthermore improve performance.
+
+A large performance improvement over standard (ex. CPU) architectures, is given by the data bus width that match the tree size.
+
+Given that every node is able to perform TREE_NODE_OP different operations, log2(TREE_NODE_OP) bit are required.
+A tree of TREE_DEPTH levels has (2^TREE_DEPTH)-1 nodes, so is fully defined by 
+
+BUS_BIT_WIDTH = log2(TREE_NODE_OP) * ((2^TREE_DEPTH)-1) bit.
+
+If a full tree is defined by 2044 bit, then the population memory, the random number generator, the selection module, etc.. handle data transfer and processing at 2044 bit, with an edge over general-purpose 64 bit architecture.
+
+**Important**: Large trees require large FPGA devices. Single trees over multiple FPGA devices is not supported at this time.
+
+
