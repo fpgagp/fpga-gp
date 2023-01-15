@@ -10,7 +10,7 @@ Symbolic Regression implementation is provided as benchmark and reference.##
 
 ## Algorithm
 
-![gp_algorithm.png](docs\images\gp_algorithm.png)
+![gp algorithm](/docs/images/gp_algorithm.png)
 
 #### Implementation
 
@@ -33,7 +33,7 @@ This project propose a new reconfigurable layer, based on tree semantic, called 
 The algorithm is implemented inside the GP_CORE block, is written in VHDL 2008 and expose an AXI interface to interconnect with the soft core that manage the communication with the Human Machine Interface (HMI).
 
 
-![hl_arch.png](docs\images\hl_arch.png)
+![high level architecture](/docs/images/hl_arch.png)
 
 A system can contain one or more GP_CORE blocks and a soft core that efficiently implement standard such as Ethernet, RS232, USB, etc..
 
@@ -41,7 +41,7 @@ Multiple instances running independently enable a parallel exploration based on 
 
 
 
-![gp_core_hl_arch.png](docs\images\gp_core_hl_arch.png)
+![gp_core high level architecture](/docs/images/gp_core_hl_arch.png)
 
 
 | Module       | Description                            |
@@ -74,13 +74,13 @@ At physical level, every tree is a a string of bits that encodes a depth-first t
 
 
 
-![exp_tree_order.png](docs\images\exp_tree_order.png)
+![trasversing order](/docs/images/exp_tree_order.png)
 
 Depth First trasversing order
 
 
 
-![exp_tree_string.png](docs\images\exp_tree_string.png)
+![tree string](/docs/images/exp_tree_string.png)
 
 Linearly represented tree
 
@@ -101,7 +101,7 @@ Assuming the following node encoding:
 
 The previous function is binary encoded as
 
-![exp_tree_string_bin.png](docs\images\exp_tree_string_bin.png)
+![binary tree string](/docs/images/exp_tree_string_bin.png)
 
 MSB bits represent the first node
 
