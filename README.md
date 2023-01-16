@@ -126,4 +126,37 @@ If a full tree is defined by 2044 bit, then the population memory, the random nu
 
 **Important**: Large trees require large FPGA devices. Single trees over multiple FPGA devices is not supported at this time.
 
+## Random Number Generator
 
+Genetic Programming requires a large number of random numbers to execute.
+A pseudo-random number generator (PRNG) based on linear feedback shift register (LFSR) is implemented.
+
+![random number generator](/docs/images/rnd_gen.png)
+
+Multiple LFSR are instanced at the same time, to generate in a single clock cycle a full tree. To improve the random numbers quality a single bit is used from each LFSR.
+
+The seed of each LFSR is loaded externally, to guarantee repeatability of experiments. After that the system is verified, is possible to change the implementation to use the PLL phase noise as a randomness source.
+
+When using deep trees, a large quantity of LFSR is required. To reduce the resource usage, a FIFO memory can be implemented, keeping mind of the production / consumption rate of random numbers.
+
+## Programmable Expression Trees
+
+The node is the foundation of the binary tree 
+
+![high level node structure](/docs/images/exp_node_hl.png)
+
+Example of a node with data width of 8 bit and 8 possible operators
+
+node_op and node_value are generally exclusive, both are there to support reprogrammability based on the content of a memory.
+
+The number of bit to represent values (children nodes, node and result) must be coherent to simplify the interconnection.
+
+The following architecture shows a node able to do addition, subtraction (implemented with an adder) and multiplication.
+
+![node RTL implementation](/docs/images/exp_node.png)
+
+Multiplexer selects the operation to execute, ideally one for each output bit.
+
+Bus size grow exponentially to the tree depth. In the following image, a three levels expression tree and the configuration memory. Terminal Virtual nodes are connected to the constant zero value.
+
+![high level programmable expression tree structure](/docs/images/exp_tree_hl.png)
