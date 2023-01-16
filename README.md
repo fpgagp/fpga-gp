@@ -139,7 +139,7 @@ The seed of each LFSR is loaded externally, to guarantee repeatability of experi
 
 When using deep trees, a large quantity of LFSR is required. To reduce the resource usage, a FIFO memory can be implemented, keeping mind of the production / consumption rate of random numbers.
 
-## Programmable Expression Trees
+## Programmable Expressions Trees
 
 The node is the foundation of the binary tree 
 
@@ -155,7 +155,7 @@ The following architecture shows a node able to do addition, subtraction (implem
 
 ![node RTL implementation](/docs/images/exp_node.png)
 
-Multiplexer selects the operation to execute, ideally one for each output bit.
+Multiplexers select the operation to execute, ideally one for each output bit.
 
 Bus size grow exponentially to the tree depth. In the following image, a three levels expression tree and the configuration memory. Terminal Virtual nodes are connected to the constant zero value.
 
