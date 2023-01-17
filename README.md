@@ -160,3 +160,19 @@ Multiplexers select the operation to execute, ideally one for each output bit.
 Bus size grow exponentially to the tree depth. In the following image, a three levels expression tree and the configuration memory. Terminal Virtual nodes are connected to the constant zero value.
 
 ![high level programmable expression tree structure](/docs/images/exp_tree_hl.png)
+
+## Fitness Computation Unit
+
+Fitness is calculated according to the following formula: 
+
+fitness = SumK(abs(var_outputK - resultK))
+
+
+![high level fitness unit](/docs/images/exp_tree_fit.png)
+
+![pipelined programmable expression tree](/docs/images/exp_tree_hp.png)
+
+EXP_MEM is a "Pipelined Content-Replaceable Memory"
+
+![expression tree waveform](/docs/images/exp_tree_waveform.png)
+
